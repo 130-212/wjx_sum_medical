@@ -1,0 +1,137 @@
+/* 明亮主题 */
+.light-theme {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --danger-color: #f72585;
+    --warning-color: #f8961e;
+    --dark-color: #1a1a2e;
+    --light-color: #f8f9fa;
+    --sidebar-bg: #f0f2f5;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #e0e0e0;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.light-theme body {
+    background-color: #f5f7fa;
+    color: var(--text-color);
+}
+
+.light-theme .sidebar {
+    background: linear-gradient(180deg, var(--sidebar-bg) 0%, #e6e9ef 100%);
+    box-shadow: var(--shadow);
+}
+
+.light-theme .logo {
+    color: var(--dark-color);
+}
+
+.light-theme .user-info {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.light-theme .nav-links a {
+    color: #555555;
+}
+
+.light-theme .nav-links a:hover, 
+.light-theme .nav-links li.active a {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+}
+
+.light-theme .app-info {
+    border-top: 1px solid var(--border-color);
+}
+
+.light-theme .gpu-status {
+    color: #666666;
+}
+
+.light-theme .app-version {
+    color: #888888;
+}
+
+.light-theme .main-content {
+    background-color: #f5f7fa;
+}
+
+.light-theme .top-bar {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.light-theme .search-box input {
+    background-color: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.light-theme .content-header h1 {
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.light-theme .content-header p {
+    color: #666666;
+}
+
+.light-theme .card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.light-theme .upload-area {
+    border: 2px dashed var(--border-color);
+}
+
+.light-theme .upload-area:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+.light-theme .image-preview img {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .control-section {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.light-theme .form-control {
+    background-color: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.light-theme .form-range {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .mask-info {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.light-theme .chart-container {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.light-theme .result-item {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.light-theme .footer {
+    border-top: 1px solid var(--border-color);
+}
+
+.light-theme .loading-overlay {
+    background: rgba(245, 247, 250, 0.9);
+}
+
+.light-theme .loading-spinner {
+    background: var(--card-bg);
+}

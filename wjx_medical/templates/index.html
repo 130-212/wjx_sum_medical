@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医学影像数据分析系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #f8961e;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --sidebar-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-color: #e6e6e6;
+            --border-color: #2d4059;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: var(--text-color);
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #0d1b2a 100%);
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px;
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .logo i {
+            font-size: 28px;
+            margin-right: 12px;
+            color: var(--success-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .avatar i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .user-role {
+            font-size: 13px;
+            color: #a0a0c0;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0 10px;
+            flex: 1;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover, .nav-links li.active a {
+            background: rgba(67, 97, 238, 0.2);
+            color: white;
+        }
+
+        .nav-links i {
+            font-size: 18px;
+            margin-right: 15px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .app-info {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .gpu-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #a0a0c0;
+        }
+
+        .gpu-status i {
+            margin-right: 10px;
+            color: var(--success-color);
+        }
+
+        .app-version {
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        /* 主内容区域样式 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #0a1929;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: rgba(16, 20, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .search-box {
+            position: relative;
+            width: 350px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            color: var(--text-color);
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-notification {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            position: relative;
+            cursor: pointer;
+            margin-right: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-notification:hover {
+            transform: scale(1.1);
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .btn-theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .content-header {
+            padding: 30px 30px 20px;
+        }
+
+        .content-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .content-header p {
+            color: #a0a0c0;
+            font-size: 16px;
+        }
+
+        .dashboard {
+            padding: 0 30px 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+
+        .col-md-4, .col-md-6, .col-md-8 {
+            padding: 0 15px;
+            margin-bottom: 30px;
+        }
+
+        .col-md-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+
+        .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .col-md-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .card-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header h2 i {
+            margin-right: 12px;
+            color: var(--success-color);
+        }
+
+        .card-body {
+            padding: 25px;
+            flex: 1;
+        }
+
+        .upload-card .card-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .upload-area .small {
+            font-size: 14px;
+            color: #a0a0c0;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-primary i {
+            margin-right: 10px;
+        }
+
+        .preview-card .card-body {
+            padding: 0;
+        }
+
+        .image-preview-container {
+            display: flex;
+            height: 100%;
+        }
+
+        .image-preview {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            min-height: 200px;
+        }
+
+        .image-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #a0a0c0;
+        }
+
+        .control-card .card-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .control-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .control-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .control-section h3 i {
+            margin-right: 10px;
+            color: var(--success-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #a0a0c0;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-color);
+            font-size: 15px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        select.form-control {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0a0c0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .form-range {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .form-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .form-range::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-range::-moz-range-thumb {
+            -moz-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .form-range::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn-control {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-control:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-control i {
+            margin-right: 10px;
+        }
+
+        /* 分割结果卡片 */
+        .segmentation-data-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .segmentation-data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .data-title {
+            color: var(--success-color);
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .data-title i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .data-item {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .data-item:hover {
+            background: rgba(67, 97, 238, 0.15);
+        }
+
+        .data-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #a0a0c0;
+            font-size: 14px;
+        }
+
+        .data-label i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+
+        .data-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .data-unit {
+            font-size: 14px;
+            color: #a0a0c0;
+            margin-left: 4px;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        /* 页脚 */
+        .footer {
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #a0a0c0;
+            margin-top: auto;
+        }
+
+        .footer-links a {
+            color: #a0a0c0;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-links a i {
+            margin-right: 5px;
+        }
+
+        /* 加载指示器 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 30, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            width: 400px;
+        }
+
+        .spinner-border {
+            width: 60px;
+            height: 60px;
+            color: var(--primary-color);
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loadingMessage {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .progress {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            transition: width 0.3s ease;
+        }
+        
+        /* Toast通知 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast-success {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .toast-warning {
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .toast-error {
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .toast-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .toast-success .toast-icon {
+            color: var(--success-color);
+        }
+        
+        .toast-warning .toast-icon {
+            color: var(--warning-color);
+        }
+        
+        .toast-error .toast-icon {
+            color: var(--danger-color);
+        }
+        
+        .toast-message {
+            flex: 1;
+            font-size: 15px;
+        }
+        
+        .toast-close {
+            margin-left: 15px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .toast-close:hover {
+            opacity: 1;
+        }
+        
+        /* 图像处理控制 */
+        .image-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .image-controls button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-color);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .image-controls button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 分割结果卡片 */
+        .result-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        /* GPU性能监控 */
+        .gpu-performance {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .gpu-performance h4 {
+            color: var(--success-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .gpu-performance h4 i {
+            margin-right: 10px;
+        }
+        
+        .perf-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .perf-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .perf-value {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+        
+        /* 导航控制 */
+        .segmentation-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .nav-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+        }
+        
+        .nav-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-info {
+            font-size: 18px;
+            font-weight: 500;
+            min-width: 120px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边导航栏 -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-lungs"></i>
+                <span>医学影像分析</span>
+            </div>
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-details">
+                    <span class="username">医生用户</span>
+                    <span class="user-role">放射科</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li class="active">
+                    <a href="#">
+                        <i class="fas fa-home"></i>
+                        <span>控制面板</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-history"></i>
+                        <span>历史记录</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-question-circle"></i>
+                        <span>帮助中心</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="app-info">
+                <div class="gpu-status">
+                    <i class="fas fa-microchip"></i>
+                    <span>GPU加速: <span id="deviceInfo">已启用</span></span>
+                </div>
+                <div class="app-version">v1.3.0</div>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索患者记录...">
+                </div>
+                <div class="top-bar-actions">
+                    <button class="btn-notification">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </button>
+                    <button class="btn-theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-header">
+                <h1>医学影像数据分析系统</h1>
+                <p>2024152310郝怡瑄</p>
+            </div>
+
+            <div class="dashboard">
+                <div class="row">
+                    <!-- 图像上传区域 -->
+                    <div class="col-md-6">
+                        <div class="card upload-card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-cloud-upload-alt"></i> 上传医学影像</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="upload-area" id="uploadArea">
+                                    <i class="fas fa-file-medical"></i>
+                                    <p>拖放图像文件或点击上传</p>
+                                    <p class="small">支持格式: JPG, PNG, DICOM</p>
+                                    <input type="file" id="imageFile" accept=".jpg,.jpeg,.png,.dcm">
+                                </div>
+                                <button class="btn-primary" id="uploadBtn">
+                                    <i class="fas fa-upload"></i> 上传图像
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 图像预览区域 -->
+                    <div class="col-md-6">
+                        <div class="card preview-card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-image"></i> 图像预览</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="image-preview-container">
+                                    <div class="image-preview">
+                                        <div class="image-result">
+                                            <img id="originalImage" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="原始图像">
+                                        </div>
+                                        <div class="image-label">原始图像</div>
+                                    </div>
+                                    <div class="image-preview">
+                                        <div class="image-result">
+                                            <img id="denoisedImage" src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="降噪图像">
+                                        </div>
+                                        <div class="image-label">降噪图像</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <!-- 处理控制面板 -->
+                    <div class="col-md-4">
+                        <div class="card control-card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-sliders-h"></i> 处理控制面板</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="control-section">
+                                    <h3><i class="fas fa-filter"></i> 降噪设置</h3>
+                                    <div class="form-group">
+                                        <label>降噪方法</label>
+                                        <select class="form-control" id="denoiseMethod">
+                                            <option value="gaussian">高斯滤波</option>
+                                            <option value="mean">均值滤波</option>
+                                            <option value="median">中值滤波</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>核大小: <span id="kernelValue">5</span></label>
+                                        <input type="range" class="form-range" min="1" max="15" step="2" value="5" id="kernelSize">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sigma: <span id="sigmaValue">1.5</span></label>
+                                        <input type="range" class="form-range" min="1" max="30" step="1" value="15" id="sigmaSlider">
+                                    </div>
+                                    <button class="btn-control" id="applyDenoiseBtn">
+                                        <i class="fas fa-play-circle"></i> 应用降噪
+                                    </button>
+                                </div>
+
+                                <div class="control-section">
+                                    <h3><i class="fas fa-cut"></i> 分割设置</h3>
+                                    <div class="form-group">
+                                        <label>分割精度</label>
+                                        <select class="form-control" id="segmentationQuality">
+                                            <option value="high">高精度</option>
+                                            <option value="medium">中等精度</option>
+                                            <option value="low">快速分割</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn-control" id="segmentBtn">
+                                        <i class="fas fa-play"></i> 分割图像
+                                    </button>
+                                </div>
+
+                                <div class="control-section">
+                                    <h3><i class="fas fa-ruler"></i> 测量设置</h3>
+                                    <div class="form-group">
+                                        <label>像素/毫米</label>
+                                        <input type="number" class="form-control" id="pixelsPerMm" value="10.0" step="0.1">
+                                    </div>
+                                    <button class="btn-control" id="measureBtn">
+                                        <i class="fas fa-calculator"></i> 测量对象
+                                    </button>
+                                </div>
+                                
+                                <div class="gpu-performance">
+                                    <h4><i class="fas fa-tachometer-alt"></i> GPU性能监控</h4>
+                                    <div class="perf-grid">
+                                        <div class="perf-item">
+                                            <span>GPU利用率:</span>
+                                            <span class="perf-value">78%</span>
+                                        </div>
+                                        <div class="perf-item">
+                                            <span>显存使用:</span>
+                                            <span class="perf-value">5.2/8 GB</span>
+                                        </div>
+                                        <div class="perf-item">
+                                            <span>处理时间:</span>
+                                            <span class="perf-value">1.24秒</span>
+                                        </div>
+                                        <div class="perf-item">
+                                            <span>温度:</span>
+                                            <span class="perf-value">64°C</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分割结果区域 -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-object-group"></i> 分割数据分析</h2>
+                            </div>
+                            <div class="card-body">
+                                <div id="segmentationData">
+                                    <!-- 分割数据卡片将通过JS动态生成 -->
+                                    <div class="segmentation-data-card">
+                                        <div class="data-title">
+                                            <i class="fas fa-lungs"></i> 肺部分析结果 #1
+                                        </div>
+                                        <div class="data-grid">
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-vector-square"></i> 区域面积
+                                                </div>
+                                                <div class="data-value">4413 <span class="data-unit">像素</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-bullseye"></i> 置信度
+                                                </div>
+                                                <div class="data-value">0.968</div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-ruler-horizontal"></i> 宽度
+                                                </div>
+                                                <div class="data-value">195.1 <span class="data-unit">px</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-ruler-vertical"></i> 高度
+                                                </div>
+                                                <div class="data-value">81.3 <span class="data-unit">px</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-ruler-combined"></i> 周长
+                                                </div>
+                                                <div class="data-value">552.4 <span class="data-unit">px</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-weight"></i> 体积
+                                                </div>
+                                                <div class="data-value">358,920 <span class="data-unit">mm³</span></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="chart-container">
+                                            <canvas id="areaChart"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="segmentation-data-card">
+                                        <div class="data-title">
+                                            <i class="fas fa-heart"></i> 心脏分析结果 #2
+                                        </div>
+                                        <div class="data-grid">
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-vector-square"></i> 区域面积
+                                                </div>
+                                                <div class="data-value">3250 <span class="data-unit">像素</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-bullseye"></i> 置信度
+                                                </div>
+                                                <div class="data-value">0.934</div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-ruler-horizontal"></i> 宽度
+                                                </div>
+                                                <div class="data-value">168.7 <span class="data-unit">px</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-ruler-vertical"></i> 高度
+                                                </div>
+                                                <div class="data-value">75.2 <span class="data-unit">px</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-ruler-combined"></i> 周长
+                                                </div>
+                                                <div class="data-value">487.6 <span class="data-unit">px</span></div>
+                                            </div>
+                                            <div class="data-item">
+                                                <div class="data-label">
+                                                    <i class="fas fa-weight"></i> 体积
+                                                </div>
+                                                <div class="data-value">244,800 <span class="data-unit">mm³</span></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="chart-container">
+                                            <canvas id="volumeChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="segmentation-nav">
+                                    <button class="nav-btn" id="prevSegment">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </button>
+                                    <div class="nav-info">
+                                        <span id="currentSegment">1</span> / <span id="totalSegments">2</span>
+                                    </div>
+                                    <button class="nav-btn" id="nextSegment">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 页脚 -->
+            <div class="footer">
+                <p>医学影像数据分析系统 v1.3.0 &copy; 2024152310郝怡瑄</p>
+                <div class="footer-links">
+                    <a href="#"><i class="fas fa-book"></i> 文档</a>
+                    <a href="#"><i class="fas fa-headset"></i> 支持</a>
+                    <a href="#"><i class="fas fa-shield-alt"></i> 隐私政策</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p id="loadingMessage">处理中，请稍候...</p>
+            <div class="progress mt-3">
+                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentFilename = null;
+        let segmentationResults = [];
+        let currentSegmentIndex = 0;
+        let totalSegments = 2; // 初始有两个演示结果
+
+        // DOM元素
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadArea = document.getElementById('uploadArea');
+        const imageFileInput = document.getElementById('imageFile');
+        const originalImage = document.getElementById('originalImage');
+        const denoisedImage = document.getElementById('denoisedImage');
+        const applyDenoiseBtn = document.getElementById('applyDenoiseBtn');
+        const segmentBtn = document.getElementById('segmentBtn');
+        const measureBtn = document.getElementById('measureBtn');
+        const denoiseMethod = document.getElementById('denoiseMethod');
+        const kernelSize = document.getElementById('kernelSize');
+        const kernelValue = document.getElementById('kernelValue');
+        const sigmaSlider = document.getElementById('sigmaSlider');
+        const sigmaValue = document.getElementById('sigmaValue');
+        const pixelsPerMm = document.getElementById('pixelsPerMm');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const progressBar = document.getElementById('progressBar');
+        const themeToggle = document.getElementById('themeToggle');
+        const prevSegmentBtn = document.getElementById('prevSegment');
+        const nextSegmentBtn = document.getElementById('nextSegment');
+        const currentSegmentEl = document.getElementById('currentSegment');
+        const totalSegmentsEl = document.getElementById('totalSegments');
+        const segmentationData = document.getElementById('segmentationData');
+
+        // 事件监听器
+        document.addEventListener('DOMContentLoaded', initApp);
+        uploadBtn.addEventListener('click', uploadImage);
+        uploadArea.addEventListener('click', () => imageFileInput.click());
+        imageFileInput.addEventListener('change', handleFileSelect);
+        applyDenoiseBtn.addEventListener('click', applyDenoising);
+        segmentBtn.addEventListener('click', segmentImage);
+        measureBtn.addEventListener('click', measureObject);
+        kernelSize.addEventListener('input', updateKernelValue);
+        sigmaSlider.addEventListener('input', updateSigmaValue);
+        themeToggle.addEventListener('click', toggleTheme);
+        prevSegmentBtn.addEventListener('click', showPrevSegment);
+        nextSegmentBtn.addEventListener('click', showNextSegment);
+
+        // 初始化应用
+        function initApp() {
+            updateKernelValue();
+            updateSigmaValue();
+            
+            // 初始设置分割结果导航
+            updateSegmentDisplay();
+            
+            // 设置分割结果总数
+            totalSegmentsEl.textContent = totalSegments;
+            
+            // 初始化图表
+            initCharts();
+        }
+        
+        // 初始化图表
+        function initCharts() {
+            // 面积分布图表
+            const areaCtx = document.getElementById('areaChart').getContext('2d');
+            new Chart(areaCtx, {
+                type: 'line',
+                data: {
+                    labels: ['区域1', '区域2', '区域3', '区域4', '区域5'],
+                    datasets: [{
+                        label: '面积分布 (像素)',
+                        data: [4413, 3250, 2870, 4120, 3560],
+                        borderColor: '#4cc9f0',
+                        backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 体积分布图表
+            const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+            new Chart(volumeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['区域1', '区域2', '区域3', '区域4', '区域5'],
+                    datasets: [{
+                        label: '体积 (mm³)',
+                        data: [358920, 244800, 201500, 329600, 284800],
+                        backgroundColor: 'rgba(67, 97, 238, 0.7)',
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 处理文件选择
+        function handleFileSelect(e) {
+            if (e.target.files.length) {
+                uploadImage();
+            }
+        }
+
+        // 更新核大小值
+        function updateKernelValue() {
+            kernelValue.textContent = kernelSize.value;
+        }
+
+        // 更新Sigma值
+        function updateSigmaValue() {
+            sigmaValue.textContent = (sigmaSlider.value / 10).toFixed(1);
+        }
+
+        // 上传图像
+        function uploadImage() {
+            if (!imageFileInput.files.length) {
+                showToast('请选择图像文件', 'warning');
+                return;
+            }
+            
+            showLoading('上传图像中...');
+            
+            // 模拟上传过程
+            setTimeout(() => {
+                const file = imageFileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    originalImage.src = e.target.result;
+                    denoisedImage.src = e.target.result;
+                    
+                    // 重置分割结果
+                    segmentationResults = [];
+                    segmentationData.innerHTML = '';
+                    totalSegments = 0;
+                    totalSegmentsEl.textContent = totalSegments;
+                    currentSegmentIndex = 0;
+                    
+                    hideLoading();
+                    showToast('图像上传成功！', 'success');
+                };
+                
+                reader.readAsDataURL(file);
+            }, 1500);
+        }
+
+        // 应用降噪
+        function applyDenoising() {
+            if (!originalImage.src.includes('placeholder')) {
+                showLoading('降噪处理中...');
+                updateProgress(30);
+                
+                // 模拟降噪过程
+                setTimeout(() => {
+                    // 在实际应用中，这里会应用真实的降噪算法
+                    // 此处仅模拟效果
+                    denoisedImage.src = originalImage.src;
+                    
+                    updateProgress(100);
+                    setTimeout(() => {
+                        hideLoading();
+                        showToast('降噪处理完成！', 'success');
+                    }, 500);
+                }, 2000);
+            } else {
+                showToast('请先上传图像', 'warning');
+            }
+        }
+
+        // 分割图像
+        function segmentImage() {
+            if (!originalImage.src.includes('placeholder')) {
+                showLoading('图像分割中，请稍候...');
+                updateProgress(20);
+                
+                // 模拟分割过程
+                setTimeout(() => {
+                    // 生成模拟分割结果
+                    simulateSegmentationResults();
+                    
+                    updateProgress(100);
+                    setTimeout(() => {
+                        hideLoading();
+                        showToast(`分割完成，找到 ${totalSegments} 个区域`, 'success');
+                    }, 500);
+                }, 3000);
+            } else {
+                showToast('请先上传图像', 'warning');
+            }
+        }
+
+        // 模拟分割结果
+        function simulateSegmentationResults() {
+            segmentationResults = [];
+            segmentationData.innerHTML = '';
+            
+            // 生成5个模拟分割结果
+            totalSegments = 5;
+            totalSegmentsEl.textContent = totalSegments;
+            
+            const organNames = ['肺部', '心脏', '肝脏', '肠道', '脾脏'];
+            const organIcons = ['fa-lungs', 'fa-heart', 'fa-leaf', 'fa-filter', 'fa-droplet'];
+            
+            for (let i = 0; i < totalSegments; i++) {
+                const result = {
+                    id: i + 1,
+                    organ: organNames[i],
+                    icon: organIcons[i],
+                    area: Math.floor(Math.random() * 5000) + 1000,
+                    confidence: (Math.random() * 0.5 + 0.5).toFixed(3),
+                    width: (Math.random() * 200 + 50).toFixed(1),
+                    height: (Math.random() * 150 + 40).toFixed(1),
+                    perimeter: (Math.random() * 600 + 300).toFixed(1),
+                    volume: Math.floor(Math.random() * 500000 + 100000)
+                };
+                
+                segmentationResults.push(result);
+                
+                // 创建分割结果卡片
+                const card = document.createElement('div');
+                card.className = 'segmentation-data-card';
+                card.innerHTML = `
+                    <div class="data-title">
+                        <i class="fas ${result.icon}"></i> ${result.organ}分析结果 #${result.id}
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <div class="data-label">
+                                <i class="fas fa-vector-square"></i> 区域面积
+                            </div>
+                            <div class="data-value">${result.area} <span class="data-unit">像素</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">
+                                <i class="fas fa-bullseye"></i> 置信度
+                            </div>
+                            <div class="data-value">${result.confidence}</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">
+                                <i class="fas fa-ruler-horizontal"></i> 宽度
+                            </div>
+                            <div class="data-value">${result.width} <span class="data-unit">px</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">
+                                <i class="fas fa-ruler-vertical"></i> 高度
+                            </div>
+                            <div class="data-value">${result.height} <span class="data-unit">px</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">
+                                <i class="fas fa-ruler-combined"></i> 周长
+                            </div>
+                            <div class="data-value">${result.perimeter} <span class="data-unit">px</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">
+                                <i class="fas fa-weight"></i> 体积
+                            </div>
+                            <div class="data-value">${result.volume.toLocaleString()} <span class="data-unit">mm³</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="chart-${i}"></canvas>
+                    </div>
+                `;
+                
+                segmentationData.appendChild(card);
+                
+                // 为每个卡片初始化图表
+                setTimeout(() => {
+                    initResultChart(i);
+                }, 100);
+            }
+            
+            // 更新当前显示的分割结果
+            currentSegmentIndex = 0;
+            updateSegmentDisplay();
+        }
+        
+        // 初始化结果图表
+        function initResultChart(index) {
+            const ctx = document.getElementById(`chart-${index}`).getContext('2d');
+            
+            // 生成随机数据
+            const dataPoints = [];
+            for (let i = 0; i < 6; i++) {
+                dataPoints.push(Math.floor(Math.random() * 5000) + 1000);
+            }
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['区域面积', '宽度', '高度', '周长', '体积(千)', '置信度(%)'],
+                    datasets: [{
+                        label: '测量值',
+                        data: dataPoints,
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.7)',
+                            'rgba(76, 201, 240, 0.7)',
+                            'rgba(248, 150, 30, 0.7)',
+                            'rgba(247, 37, 133, 0.7)',
+                            'rgba(106, 76, 147, 0.7)',
+                            'rgba(56, 193, 114, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(67, 97, 238, 1)',
+                            'rgba(76, 201, 240, 1)',
+                            'rgba(248, 150, 30, 1)',
+                            'rgba(247, 37, 133, 1)',
+                            'rgba(106, 76, 147, 1)',
+                            'rgba(56, 193, 114, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 测量对象
+        function measureObject() {
+            if (segmentationResults.length > 0) {
+                showToast('测量功能已执行', 'success');
+            } else {
+                showToast('请先分割图像', 'warning');
+            }
+        }
+
+        // 显示上一个分割结果
+        function showPrevSegment() {
+            if (currentSegmentIndex > 0) {
+                currentSegmentIndex--;
+                updateSegmentDisplay();
+            }
+        }
+
+        // 显示下一个分割结果
+        function showNextSegment() {
+            if (currentSegmentIndex < totalSegments - 1) {
+                currentSegmentIndex++;
+                updateSegmentDisplay();
+            }
+        }
+
+        // 更新分割结果显示
+        function updateSegmentDisplay() {
+            if (totalSegments === 0) return;
+            
+            currentSegmentEl.textContent = currentSegmentIndex + 1;
+            
+            // 更新按钮状态
+            prevSegmentBtn.disabled = currentSegmentIndex === 0;
+            nextSegmentBtn.disabled = currentSegmentIndex === totalSegments - 1;
+        }
+
+        // 切换主题
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const icon = themeToggle.querySelector('i');
+            if (document.body.classList.contains('light-theme')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+
+        // 显示加载指示器
+        function showLoading(message) {
+            loadingMessage.textContent = message;
+            loadingOverlay.style.display = 'flex';
+            updateProgress(10);
+        }
+
+        // 更新进度条
+        function updateProgress(value) {
+            progressBar.style.width = `${value}%`;
+        }
+
+        // 隐藏加载指示器
+        function hideLoading() {
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+                progressBar.style.width = '0%';
+            }, 300);
+        }
+
+        // 显示Toast通知
+        function showToast(message, type) {
+            // 创建Toast元素
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+                <div class="toast-close"><i class="fas fa-times"></i></div>
+            `;
+            
+            // 添加到页面
+            document.body.appendChild(toast);
+            
+            // 显示Toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // 自动隐藏
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 5000);
+            
+            // 添加关闭事件
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            });
+        }
+    </script>
+</body>
+</html>
